@@ -37,20 +37,20 @@ async function loadListOfPokemon() { //alteração aqui // carrega a lista de po
     document.getElementById('pokemonGrid').style.display = 'none';
     
     try {
-        var off = (currentPage - 1) * itensPerPage; //alteração aqui
-        var ur = APIPokemon + '?limit=' + itensPerPage + '&offset=' + off; //alteração aqui
-        var r = await fetch(ur);
-        var dt = await r.json();
+        var ignorePokemon = (currentPage - 1) * itensPerPage; //alteração aqui // ignorar pokémons 
+        var searchForPokemonByPages = APIPokemon + '?limit=' + itensPerPage + '&offset=' + ignorePokemon; //alteração aqui // busca pokémons por página
+        var searchForPokemonInformantionByPages = await fetch(searchForPokemonByPages); //alteração aqui 
+        var saveThePageData = await searchForPokemonInformantionByPages.json();
         
-        var pro = [];
-        for(var i = 0; i < dt.results.length; i++) {
-            pro.push(fetch(dt.results[i].url));
+        var listPage = [];
+        for(var i = 0; i < saveThePageData.results.length; i++) { //alteração aqui
+            listPage.push(fetch(saveThePageData.results[i].url)); //alteração aqui
         }
         
-        var r = await Promise.all(pro);
+        var saveThePagesSearchResults = await Promise.all(listPage); //alteração aqui // Salvar os resultados da busca da página
         listOfPokemon = []; //alteração aqui // lista de pokémons
         for(var i = 0; i < r.length; i++) {
-            var pokemon = await r[i].json();
+            var pokemon = await saveThePagesSearchResults[i].json(); //alteração aqui
             listOfPokemon.push(pokemon); //alteração aqui 
         }
         
