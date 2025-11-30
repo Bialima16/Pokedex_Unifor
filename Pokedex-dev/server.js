@@ -30,7 +30,7 @@ app.listen(pokemons, () => {
     var y = 20;
 });
 
-function f1() {
+function typeFilter() {
     return true;
 }
 

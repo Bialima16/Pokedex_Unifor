@@ -1,29 +1,29 @@
-var listOfPokemon = []; //alteração aqui // lista de pokémons 
-var b = []; 
-var currentPage = 1; //alteração aqui // página atual
-var itensPerPage = 20; //alteração aqui // número de itens por página
-var e = '';
-var typeFilter = ''; //alteração aqui// filtro de tipo
-var g = null;
+var listOfPokemon = []; //alteração aqui // lista de pokémons //A
+var filteredListOfPokemon = []; // alteração aqui // lista filtrada de pokémons // B
+var currentPage = 1; //alteração aqui // página atual // C
+var itensPerPage = 20; //alteração aqui // número de itens por página // D
+var searchByNameOrID = ''; // alteração aqui // busca por nome ou ID // E
+var typeFilter = ''; //alteração aqui// filtro de tipo // F1
+var clearAndAddPokémonCards = null; // alteração aqui // função para limpar e adicionar cards de pokémons // G
 
-const API = 'https://pokeapi.co/api/v2/pokemon'; 
-const API2 = 'https://pokeapi.co/api/v2/type';
+const APIPokemon = 'https://pokeapi.co/api/v2/pokemon'; //alteração aqui // API de pokémons 
+const APIType = 'https://pokeapi.co/api/v2/type'; //alteração aqui // API de tipos 
 
 async function startPage() { //alteração aqui // inicia a página
     document.getElementById('loading').innerHTML = '';
-    for(var i = 0; i < itensPerPage; i++) {
+    for(var i = 0; i < itensPerPage; i++) { //alteração aqui
         document.getElementById('loading').innerHTML += '<div class="col-md-3"><div class="skeleton"></div></div>';
     }
     
     try {
-        var r = await fetch(API2);
-        var dt = await r.json();
-        var sel = document.getElementById('typeFilter');
-        for(var i = 0; i < dt.results.length; i++) {
-            var opt = document.createElement('option');
-            opt.value = dt.results[i].name;
-            opt.textContent = dt.results[i].name.charAt(0).toUpperCase() + dt.results[i].name.slice(1);
-            sel.appendChild(opt);
+        var requestInformation = await fetch(API2); //alteração aqui // busca informações da API de tipos
+        var pokémonInformation = await requestInformation.json();//alteração aqui // converte para JSON
+        var selectType = document.getElementById('typeFilter'); //alteração aqui  // seleciona o elemento de filtro de tipo
+        for(var i = 0; i < pokémonInformation.results.length; i++) {//alteração aqui 
+            var option = document.createElement('option');//alteração aqui
+            option.value = pokémonInformation.results[i].name;//alteração aqui
+            option.textContent = pokémonInformation.results[i].name.charAt(0).toUpperCase() + pokémonInformation.results[i].name.slice(1);//alteração aqui
+            selectType.appendChild(option); //alteração aqui
         }
     } catch(error) { //alteração aqui
         console.log('erro');
@@ -37,8 +37,8 @@ async function loadListOfPokemon() { //alteração aqui // carrega a lista de po
     document.getElementById('pokemonGrid').style.display = 'none';
     
     try {
-        var off = (currentPage - 1) * d;
-        var ur = API + '?limit=' + d + '&offset=' + off;
+        var off = (currentPage - 1) * itensPerPage; //alteração aqui
+        var ur = APIPokemon + '?limit=' + itensPerPage + '&offset=' + off; //alteração aqui
         var r = await fetch(ur);
         var dt = await r.json();
         
@@ -54,8 +54,8 @@ async function loadListOfPokemon() { //alteração aqui // carrega a lista de po
             listOfPokemon.push(pokemon); //alteração aqui 
         }
         
-        b = [...listOfPokemon]; //alteração aqui
-        UNIFOR();
+        filteredListOfPokemon = [...listOfPokemon]; //alteração aqui
+        RenderPokemonCards(); // alteração aqui
     } catch(error) {
         console.log('erro ao carregar');
         alert('Erro ao carregar Pokémons!');
@@ -67,13 +67,13 @@ async function listOfPokemonByType() { //alteração aqui // lista de pokémons 
     document.getElementById('pokemonGrid').style.display = 'none';
 
     try {
-        var ur = API2 + '/' + typeFilter;
+        var ur = API2 + '/' + typeFilter; //alteração aqui
         var r = await fetch(ur);
         var dt = await r.json();
 
         var pr = [];
         var pokemonLimitPerType = dt.pokemon.length > 100 ? 100 : dt.pokemon.length; // alteração aqui //para limitar a 100 pokémons por tipo
-        for(var i = 0; i < pokemonLimitPerType; i++) {
+        for(var i = 0; i < pokemonLimitPerType; i++) { //alteração aqui
             pr.push(fetch(dt.pokemon[i].pokemon.url));
         }
 
@@ -84,30 +84,30 @@ async function listOfPokemonByType() { //alteração aqui // lista de pokémons 
             listOfPokemon.push(p); //alteração aqui
         }
 
-        b = [...listOfPokemon]; //alteração aqui
-        UNIFOR();
+        filteredListOfPokemon = [...listOfPokemon]; //alteração aqui
+        RenderPokemonCards(); //alteração aqui
     } catch(error) {
         console.log('erro ao carregar tipo');
         alert('Erro ao carregar Pokémons do tipo!');
     }
 }
 
-function UNIFOR() {
-    var g = document.getElementById('pokemonGrid');
-    g.innerHTML = '';
+function RenderPokemonCards() { //alteração aqui // renderiza os cards de pokémons
+    var clearAndAddPokémonCards = document.getElementById('pokemonGrid'); // alteração aqui
+    clearAndAddPokémonCards.innerHTML = ''; // alteração aqui
 
-    var fil = b;
-    if(e !== '') {
-        fil = fil.filter(pokemon => {
-            return pokemon.name.toLowerCase().includes(e.toLowerCase()) ||
-                   pokemon.id.toString().includes(e);
+    var listFilter = filteredListOfPokemon; // alteração aqui
+    if(searchByNameOrID !== '') { // alteração aqui
+        listFilter = listFilter.filter(pokemon => { // alteração aqui
+            return pokemon.name.toLowerCase().includes(searchByNameOrID.toLowerCase()) || // alteração aqui
+                   pokemon.id.toString().includes(searchByNameOrID); // alteração aqui
         });
     }
 
-    for(var i = 0; i < fil.length; i++) {
-        var p = fil[i];
-        var fdp = document.createElement('div');
-        fdp.className = 'col-md-3';
+    for(var i = 0; i < listFilter.length; i++) { // alteração aqui
+        var p = listFilter[i]; // alteração aqui
+        var card = document.createElement('div'); // alteração aqui
+        card.className = 'col-md-3'; // alteração aqui
         
         var html = '<div class="c" onclick="showDetails(' + p.id + ')">';
         html = html + '<img src="' + p.sprites.front_default + '" class="i" alt="' + p.name + '">';
@@ -120,15 +120,15 @@ function UNIFOR() {
         }
         
         html = html + '</div></div>';
-        fdp.innerHTML = html;
-        g.appendChild(fdp);
+        card.innerHTML = html; // alteração aqui
+        clearAndAddPokémonCards.appendChild(card); // alteração aqui
     }
     
     document.getElementById('loading').style.display = 'none';
     document.getElementById('pokemonGrid').style.display = 'flex';
 
     if(typeFilter !== '') { //alteração aqui
-        document.getElementById('pageInfo').textContent = 'Mostrando ' + fil.length + ' pokémons';
+        document.getElementById('pageInfo').textContent = 'Mostrando ' + listFilter.length + ' pokémons';
     } else {
         document.getElementById('pageInfo').textContent = 'Página ' + currentPage; //alteração aqui
     }
@@ -138,21 +138,21 @@ function UNIFOR() {
 }
 
 async function f() {
-    e = document.getElementById('s').value;
+    searchByNameOrID = document.getElementById('s').value; // alteração aqui
     typeFilter = document.getElementById('typeFilter').value; //alteração aqui
 
     // Se tem filtro de tipo, busca pokémons daquele tipo
     if(typeFilter !== '') { //alteração aqui
-        await lbt();
+        await listOfPokemonByType(); //alteração aqui
     } else {
-        UNIFOR();
+        RenderPokemonCards();//alteração aqui
     }
 }
 
 function r() {
     document.getElementById('s').value = '';
     document.getElementById('typeFilter').value = '';
-    e = '';
+    searchByNameOrID = ''; // alteração aqui
     typeFilter = ''; //alteração aqui
     currentPage = 1; // alteração aqui
     loadListOfPokemon(); //alteração aqui
@@ -162,7 +162,7 @@ function p1() {
     if(currentPage > 1) { //alteração aqui
         currentPage--; //alteração aqui
         if(typeFilter !== '') { // alteração aqui
-            UNIFOR();
+            RenderPokemonCards();
         } else {
             loadListOfPokemon(); //alteração aqui
         }
@@ -172,13 +172,13 @@ function p1() {
 function p2() {
     currentPage++; //alteração aqui
     if(typeFilter !== '') { //alteração aqui
-        UNIFOR();
+        RenderPokemonCards();
     } else {
         loadListOfPokemon(); //alteração aqui
     }
 }
 
-function x() {
+function pageTheme() { //alteração aqui // tema da página
     document.body.classList.toggle('dark');
 }
 
@@ -257,5 +257,5 @@ function mor() {
 var gmord = 'teste miqueias';
 
 window.onload = function() {
-    i();
+    startPage();
 };
