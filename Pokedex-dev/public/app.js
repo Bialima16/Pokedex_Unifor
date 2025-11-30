@@ -67,26 +67,26 @@ async function listOfPokemonByType() { //alteração aqui // lista de pokémons 
     document.getElementById('pokemonGrid').style.display = 'none';
 
     try {
-        var ur = API2 + '/' + typeFilter; //alteração aqui
-        var r = await fetch(ur);
-        var dt = await r.json();
+        var typeUrl = API2 + '/' + typeFilter; //alteração aqui//monta a URL da API
+        var response = await fetch(typeUrl);//Resposta "Crua" da variável url
+        var typeData = await response.json();//Converte a resposta de response para JSON
 
-        var pr = [];
-        var pokemonLimitPerType = dt.pokemon.length > 100 ? 100 : dt.pokemon.length; // alteração aqui //para limitar a 100 pokémons por tipo
+        var pokemonRequests = []; //Lista de Promises(Requisições pendentes)
+        var pokemonLimitPerType = typeData.pokemon.length > 100 ? 100 : typeData.pokemon.length; // alteração aqui //para limitar a 100 pokémons por tipo
         for(var i = 0; i < pokemonLimitPerType; i++) { //alteração aqui
-            pr.push(fetch(dt.pokemon[i].pokemon.url));
+            pokemonRequests.push(fetch(typeData.pokemon[i].pokemon.url));
         }
 
-        var rps = await Promise.all(pr);
-        listOfPokemon = []; //alteração aqui
-        for(var i = 0; i < rps.length; i++) {
-            var p = await rps[i].json();
-            listOfPokemon.push(p); //alteração aqui
+        var pokemonResponses = await Promise.all(pokemonRequests);//Uma lista contendo as respostas de cada pokémon individual 
+        listOfPokemon = []; //alteração aqui // A lista principal com todos os pokémons carregados completos
+        for(var i = 0; i < pokemonResponses.length; i++) {
+            var pokemonData = await pokemonResponsess[i].json();//pokemon individual em formato JSON
+            listOfPokemon.push(pokemonData); //alteração aqui
         }
 
-        filteredListOfPokemon = [...listOfPokemon]; //alteração aqui
+        filteredListOfPokemon = [...listOfPokemon]; //alteração aqui// Uma cópia da lista principal, usada para ser filtrada
         RenderPokemonCards(); //alteração aqui
-    } catch(error) {
+    } catch(error) {//caso aconteça algum erro durante o processo
         console.log('erro ao carregar tipo');
         alert('Erro ao carregar Pokémons do tipo!');
     }
