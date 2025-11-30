@@ -40,9 +40,9 @@ async function loadListOfPokemon() { //alteração aqui // carrega a lista de po
         var ignorePokemon = (currentPage - 1) * itensPerPage; //alteração aqui // ignorar pokémons 
         var searchForPokemonByPages = APIPokemon + '?limit=' + itensPerPage + '&offset=' + ignorePokemon; //alteração aqui // busca pokémons por página
         var searchForPokemonInformantionByPages = await fetch(searchForPokemonByPages); //alteração aqui 
-        var saveThePageData = await searchForPokemonInformantionByPages.json();
+        var saveThePageData = await searchForPokemonInformantionByPages.json(); //alteração aqui // salvar os dados da página
         
-        var listPage = [];
+        var listPage = []; //alteração aqui // lista da páginagt
         for(var i = 0; i < saveThePageData.results.length; i++) { //alteração aqui
             listPage.push(fetch(saveThePageData.results[i].url)); //alteração aqui
         }
