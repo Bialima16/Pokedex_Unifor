@@ -2,7 +2,7 @@ copiei o cogido e mandei esse prompt:
 
 so quero que vc traduza esse codigo,n quero que corrija nada;
 
---------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 
 var a = [];
 var b = [];
@@ -70,11 +70,11 @@ async function l() {
 
 a variavel A é a mesma que esta no metodo l?
 
-----------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
 "value" qual a função disso?
-----------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
 "await" e isso?
----------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
 var listOfPokemon = []; //alteração aqui // lista de pokémons //A
 var filteredListOfPokemon = []; // alteração aqui // lista filtrada de pokémons // B
 var currentPage = 1; //alteração aqui // página atual // C
@@ -338,6 +338,88 @@ window.onload = function() {
 };
 
 existe algum erro nesse codigo???
---------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------
  var r = await fetch(API2); o que essa variavel faz??
- -------------------------------------------------------
+ ---------------------------------------------------------------------------------------------------------------------------
+ function UNIFOR() {
+    var clearAndAddPokémonCards = document.getElementById('pokemonGrid');
+    clearAndAddPokémonCards.innerHTML = '';
+
+    var filter = filteredListOfPokemon; // alteração aqui
+    if(searchByNameOrID !== '') { // alteração aqui
+        filter = filter.filter(pokemon => {
+            return pokemon.name.toLowerCase().includes(searchByNameOrID.toLowerCase()) || // alteração aqui
+                   pokemon.id.toString().includes(searchByNameOrID); // alteração aqui
+        });
+    }
+
+    for(var i = 0; i < filter.length; i++) {
+        var p = filter[i];
+        var fdp = document.createElement('div');
+        fdp.className = 'col-md-3';
+        
+        var html = '<div class="c" onclick="showDetails(' + p.id + ')">';
+        html = html + '<img src="' + p.sprites.front_default + '" class="i" alt="' + p.name + '">';
+        html = html + '<h5 class="text-center">#' + p.id + ' ' + p.name.charAt(0).toUpperCase() + p.name.slice(1) + '</h5>';
+        html = html + '<div class="text-center">';
+        
+        for(var j = 0; j < p.types.length; j++) {
+            var typeName = p.types[j].type.name;
+            html = html + '<span class="badge type-' + typeName + '">' + typeName + '</span> ';
+        }
+        
+        html = html + '</div></div>';
+        fdp.innerHTML = html;
+        clearAndAddPokémonCards.appendChild(fdp);
+    }
+    
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('pokemonGrid').style.display = 'flex';
+
+    if(typeFilter !== '') { //alteração aqui
+        document.getElementById('pageInfo').textContent = 'Mostrando ' + filter.length + ' pokémons';
+    } else {
+        document.getElementById('pageInfo').textContent = 'Página ' + currentPage; //alteração aqui
+    }
+
+    document.getElementById('prevBtn').disabled = currentPage === 1 || typeFilter !== ''; //alteração aqui
+    document.getElementById('nextBtn').disabled = typeFilter !== ''; //alteração aqui
+}
+
+o que essa função faz exatamente??
+--------------------------------------------------------------------------------------------------------------------------------
+
+async function l() {
+    document.getElementById('loading').style.display = 'flex';
+    document.getElementById('pokemonGrid').style.display = 'none';
+    
+    try {
+        var off = (c - 1) * d;
+        var ur = API + '?limit=' + d + '&offset=' + off;
+        var r = await fetch(ur);
+        var dt = await r.json();
+        
+        var pro = [];
+        for(var i = 0; i < dt.results.length; i++) {
+            pro.push(fetch(dt.results[i].url));
+        }
+        
+        var r = await Promise.all(pro);
+        a = [];
+        for(var i = 0; i < r.length; i++) {
+            var pokemon = await r[i].json();
+            a.push(pokemon);
+        }
+        
+        b = [...a];
+        UNIFOR();
+    } catch(error) {
+        console.log('erro ao carregar');
+        alert('Erro ao carregar Pokémons!');
+    }
+}
+existe duas variaveis r nessa função,elas sao a mesma coisa??
+
+-------------------------------------------------------------------------------------------------------------------------------
+se eu der um outro nome a segunda variavel,tem a possibilidade do codigo quebrar??
+--------------------------------------------------------------------------------------------------------------------------------

@@ -49,7 +49,7 @@ async function loadListOfPokemon() { //alteração aqui // carrega a lista de po
         
         var saveThePagesSearchResults = await Promise.all(listPage); //alteração aqui // Salvar os resultados da busca da página
         listOfPokemon = []; //alteração aqui // lista de pokémons
-        for(var i = 0; i < r.length; i++) {
+        for(var i = 0; i < saveThePagesSearchResults.length; i++) { //alteração aqui
             var pokemon = await saveThePagesSearchResults[i].json(); //alteração aqui
             listOfPokemon.push(pokemon); //alteração aqui 
         }
@@ -149,7 +149,7 @@ async function f() {
     }
 }
 
-function r() {
+function reset() {
     document.getElementById('s').value = '';
     document.getElementById('typeFilter').value = '';
     searchByNameOrID = ''; // alteração aqui
@@ -158,7 +158,7 @@ function r() {
     loadListOfPokemon(); //alteração aqui
 }
 
-function p1() {
+function goBackAPage() { //alteração aqui // voltar uma página
     if(currentPage > 1) { //alteração aqui
         currentPage--; //alteração aqui
         if(typeFilter !== '') { // alteração aqui
@@ -169,10 +169,10 @@ function p1() {
     }
 }
 
-function p2() {
+function nextPage() { //alteração aqui // próxima página
     currentPage++; //alteração aqui
     if(typeFilter !== '') { //alteração aqui
-        RenderPokemonCards();
+        RenderPokemonCards(); // alteração aqui //
     } else {
         loadListOfPokemon(); //alteração aqui
     }
@@ -247,14 +247,6 @@ async function Minhe_nha(id) {
         alert('Erro ao carregar detalhes!');
     }
 }
-
-function mor() {
-    var x = 10;
-    var y = 20;
-    return x + y;
-}
-
-var gmord = 'teste miqueias';
 
 window.onload = function() {
     startPage();
