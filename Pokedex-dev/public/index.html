@@ -26,7 +26,7 @@
     <div class="container mt-4">
         <div class="row mb-4">
             <div class="col-md-6">
-                <input type="text" class="form-control" id="s" placeholder="Buscar Pokémon..." onkeyup="applyFilters()">
+                <input type="text" class="form-control" id="SearchPokemon" placeholder="Buscar Pokémon..." onkeyup="applyFilters()">
             </div>
             <div class="col-md-4">
                 <select class="form-select" id="typeFilter" onchange="applyFilters()">
@@ -57,7 +57,7 @@
     </div>
 
     <!-- Modal de detalhes -->
-    <div class="modal fade" id="m" tabindex="-1">
+    <div class="modal fade" id="modalDetails" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">

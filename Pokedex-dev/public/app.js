@@ -143,7 +143,7 @@ function RenderPokemonCards() { //alteração aqui // renderiza os cards de pok�
 }
 
 async function applyFilters() {//alteração aqui//função para aplicar os filtros
-    searchByNameOrID = document.getElementById('s').value; // alteração aqui
+    searchByNameOrID = document.getElementById('SearchPokemon').value; // alteração aqui
     typeFilter = document.getElementById('typeFilter').value; //alteração aqui
 
     // Se tem filtro de tipo, busca pokémons daquele tipo
@@ -155,7 +155,7 @@ async function applyFilters() {//alteração aqui//função para aplicar os filt
 }
 
 function reset() {
-    document.getElementById('s').value = '';
+    document.getElementById('SearchPokemon').value = '';
     document.getElementById('typeFilter').value = '';
     searchByNameOrID = ''; // alteração aqui
     typeFilter = ''; //alteração aqui
@@ -244,7 +244,7 @@ async function openPokemonDetails(id) {//Modal com detalhes do pokémon
         
         document.getElementById('modalBody').innerHTML = htmlContent;
         
-        var modalInstance = new bootstrap.Modal(document.getElementById('m'));
+        var modalInstance = new bootstrap.Modal(document.getElementById('modalDetails'));
         modalInstance.show();
         
     } catch(error) {
