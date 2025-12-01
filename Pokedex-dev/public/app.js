@@ -6,6 +6,9 @@ var searchByNameOrID = ''; // alteração aqui // busca por nome ou ID // E
 var typeFilter = ''; //alteração aqui// filtro de tipo // F1
 var clearAndAddPokémonCards = null; // alteração aqui // função para limpar e adicionar cards de pokémons // G
 
+const maxPokemonPerType = 100; // alteração aqui // número máximo de pokémons por tipo // F2
+const deciConversion = 10; // alteração aqui // conversão decimal // 
+const statMaxValue = 255; // alteração aqui // valor máximo de estatísticas // 
 const APIPokemon = 'https://pokeapi.co/api/v2/pokemon'; //alteração aqui // API de pokémons 
 const APIType = 'https://pokeapi.co/api/v2/type'; //alteração aqui // API de tipos 
 
@@ -16,7 +19,7 @@ async function startPage() { //alteração aqui // inicia a página
     }
     
     try {
-        var requestInformation = await fetch(API2); //alteração aqui // busca informações da API de tipos
+        var requestInformation = await fetch(APIType); //alteração aqui // busca informações da API de tipos
         var pokémonInformation = await requestInformation.json();//alteração aqui // converte para JSON
         var selectType = document.getElementById('typeFilter'); //alteração aqui  // seleciona o elemento de filtro de tipo
         for(var i = 0; i < pokémonInformation.results.length; i++) {//alteração aqui 
@@ -67,12 +70,12 @@ async function listOfPokemonByType() { //alteração aqui // lista de pokémons 
     document.getElementById('pokemonGrid').style.display = 'none';
 
     try {
-        var typeUrl = API2 + '/' + typeFilter; //alteração aqui//monta a URL da API
+        var typeUrl = APIType + '/' + typeFilter; //alteração aqui//monta a URL da API
         var response = await fetch(typeUrl);//Resposta "Crua" da variável url
         var typeData = await response.json();//Converte a resposta de response para JSON
 
         var pokemonRequests = []; //Lista de Promises(Requisições pendentes)
-        var pokemonLimitPerType = typeData.pokemon.length > 100 ? 100 : typeData.pokemon.length; // alteração aqui //para limitar a 100 pokémons por tipo
+        var pokemonLimitPerType = typeData.pokemon.length > maxPokemonPerType ? maxPokemonPerType : typeData.pokemon.length; // alteração aqui //para limitar a 100 pokémons por tipo
         for(var i = 0; i < pokemonLimitPerType; i++) { //alteração aqui
             pokemonRequests.push(fetch(typeData.pokemon[i].pokemon.url));
         }
@@ -80,7 +83,7 @@ async function listOfPokemonByType() { //alteração aqui // lista de pokémons 
         var pokemonResponses = await Promise.all(pokemonRequests);//Uma lista contendo as respostas de cada pokémon individual 
         listOfPokemon = []; //alteração aqui // A lista principal com todos os pokémons carregados completos
         for(var i = 0; i < pokemonResponses.length; i++) {
-            var pokemonData = await pokemonResponsess[i].json();//pokemon individual em formato JSON
+            var pokemonData = await pokemonResponses[i].json();//pokemon individual em formato JSON
             listOfPokemon.push(pokemonData); //alteração aqui
         }
 
@@ -105,23 +108,23 @@ function RenderPokemonCards() { //alteração aqui // renderiza os cards de pok�
     }
 
     for(var i = 0; i < listFilter.length; i++) { // alteração aqui
-        var p = listFilter[i]; // alteração aqui
-        var card = document.createElement('div'); // alteração aqui
-        card.className = 'col-md-3'; // alteração aqui
+        var individualPokemon = listFilter[i]; // alteração aqui// p = pokémon individual
+        var cardElement = document.createElement('div'); // alteração aqui // cria o card
+        cardElement.className = 'col-md-3'; // alteração aqui
         
-        var html = '<div class="c" onclick="showDetails(' + p.id + ')">';
-        html = html + '<img src="' + p.sprites.front_default + '" class="i" alt="' + p.name + '">';
-        html = html + '<h5 class="text-center">#' + p.id + ' ' + p.name.charAt(0).toUpperCase() + p.name.slice(1) + '</h5>';
-        html = html + '<div class="text-center">';
+        var cardHtml = '<div class="c" onclick="openPokemonDetails(' + individualPokemon.id + ')">';
+        cardHtml = cardHtml + '<img src="' + individualPokemon.sprites.front_default + '" class="i" alt="' + individualPokemon.name + '">';
+        cardHtml = cardHtml + '<h5 class="text-center">#' + individualPokemon.id + ' ' + individualPokemon.name.charAt(0).toUpperCase() + individualPokemon.name.slice(1) + '</h5>';
+        cardHtml = cardHtml + '<div class="text-center">';
         
-        for(var j = 0; j < p.types.length; j++) {
-            var typeName = p.types[j].type.name;
-            html = html + '<span class="badge type-' + typeName + '">' + typeName + '</span> ';
+        for(var typeIndex = 0; typeIndex < individualPokemon.types.length; typeIndex++) {
+            var typeName = individualPokemon.types[typeIndex].type.name;
+            cardHtml = cardHtml + '<span class="badge type-' + typeName + '">' + typeName + '</span> ';
         }
         
-        html = html + '</div></div>';
-        card.innerHTML = html; // alteração aqui
-        clearAndAddPokémonCards.appendChild(card); // alteração aqui
+        cardHtml = cardHtml + '</div></div>';
+        cardElement.innerHTML = cardHtml; // alteração aqui
+        clearAndAddPokémonCards.appendChild(cardElement); // alteração aqui
     }
     
     document.getElementById('loading').style.display = 'none';
@@ -137,7 +140,7 @@ function RenderPokemonCards() { //alteração aqui // renderiza os cards de pok�
     document.getElementById('nextBtn').disabled = typeFilter !== ''; //alteração aqui
 }
 
-async function f() {
+async function applyFilters() {//alteração aqui//função para aplicar os filtros
     searchByNameOrID = document.getElementById('s').value; // alteração aqui
     typeFilter = document.getElementById('typeFilter').value; //alteração aqui
 
@@ -182,65 +185,65 @@ function pageTheme() { //alteração aqui // tema da página
     document.body.classList.toggle('dark');
 }
 
-async function Minhe_nha(id) {
+async function openPokemonDetails(id) {//Modal com detalhes do pokémon
     try {
-        var xpto = await fetch(API + '/' + id);
-        var p = await xpto.json();
+        var pokemonResponse = await fetch(APIPokemon + '/' + id);// Chama a API usando o ID do pokémon
+        var pokemonData = await pokemonResponse.json();//Converte a resposta para JSON
         
-        var zyz = await fetch(p.species.url);
-        var m = await zyz.json();
+        var speciesResponse = await fetch(pokemonData.species.url);// Busca informações da espécie do pokémon
+        var speciesData = await speciesResponse.json();// Converte a resposta para JSON
         
-        var desc = '';
-        for(var i = 0; i < m.flavor_text_entries.length; i++) {
-            if(m.flavor_text_entries[i].language.name === 'en') {
-                desc = m.flavor_text_entries[i].flavor_text;
+        var pokemonDescription = '';
+        for(var i = 0; i < speciesData.flavor_text_entries.length; i++) {//Encontra a descrição em inglês
+            if(speciesData.flavor_text_entries[i].language.name === 'en') {
+                pokemonDescription = speciesData.flavor_text_entries[i].flavor_text;
                 break;
             }
         }
         
-        document.getElementById('modalTitle').textContent = '#' + p.id + ' ' + p.name.charAt(0).toUpperCase() + p.name.slice(1);
+        document.getElementById('modalTitle').textContent = '#' + pokemonData.id + ' ' + pokemonData.name.charAt(0).toUpperCase() + pokemonData.name.slice(1);//Titulo do Modal
         
-        var ph = '<div class="row"><div class="col-md-6">';
-        ph += '<div class="sprite-container">';
-        ph += '<div><img src="' + p.sprites.front_default + '" alt="front"><p class="text-center">Normal</p></div>';
-        ph += '<div><img src="' + p.sprites.front_shiny + '" alt="shiny"><p class="text-center">Shiny</p></div>';
-        ph += '</div>';
+        var htmlContent = '<div class="row"><div class="col-md-6">';//Conteudo do Modal
+        htmlContent += '<div class="sprite-container">';
+        htmlContent += '<div><img src="' + pokemonData.sprites.front_default + '" alt="front"><p class="text-center">Normal</p></div>';//Imagens
+        htmlContent += '<div><img src="' + pokemonData.sprites.front_shiny + '" alt="shiny"><p class="text-center">Shiny</p></div>';
+        htmlContent += '</div>';
         
-        ph += '<p><strong>Tipo:</strong> ';
-        for(var i = 0; i < p.types.length; i++) {
-            ph += '<span class="badge type-' + p.types[i].type.name + '">' + p.types[i].type.name + '</span> ';
+        htmlContent += '<p><strong>Tipo:</strong> ';
+        for(var i = 0; i < pokemonData.types.length; i++) {
+            htmlContent += '<span class="badge type-' + pokemonData.types[i].type.name + '">' + pokemonData.types[i].type.name + '</span> ';
         }
-        ph += '</p>';
+        htmlContent += '</p>';
         
-        ph += '<p><strong>Altura:</strong> ' + (p.height / 10) + ' m</p>';
-        ph += '<p><strong>Peso:</strong> ' + (p.weight / 10) + ' kg</p>';
+        htmlContent += '<p><strong>Altura:</strong> ' + (pokemonData.height / deciConversion) + ' m</p>';
+        htmlContent += '<p><strong>Peso:</strong> ' + (pokemonData.weight / deciConversion) + ' kg</p>';
         
-        ph += '<p><strong>Habilidades:</strong> ';
-        for(var i = 0; i < p.abilities.length; i++) {
-            ph += p.abilities[i].ability.name;
-            if(i < p.abilities.length - 1) ph += ', ';
+        htmlContent += '<p><strong>Habilidades:</strong> ';
+        for(var i = 0; i < pokemonData.abilities.length; i++) {
+            htmlContent += pokemonData.abilities[i].ability.name;
+            if(i < pokemonData.abilities.length - 1) htmlContent += ', ';
         }
-        ph += '</p>';
+        htmlContent += '</p>';
         
-        ph += '</div><div class="col-md-6">';
+        htmlContent += '</div><div class="col-md-6">';
         
-        ph += '<p><strong>Descrição:</strong></p>';
-        ph += '<p>' + desc.replace(/\f/g, ' ') + '</p>';
+        htmlContent += '<p><strong>Descrição:</strong></p>';
+        htmlContent += '<p>' + pokemonDescription.replace(/\f/g, ' ') + '</p>';
         
-        ph += '<h6>Estatísticas:</h6>';
-        for(var i = 0; i < p.stats.length; i++) {
-            var stat = p.stats[i];
-            var percentage = (stat.base_stat / 255) * 100;
-            ph += '<div><small>' + stat.stat.name + ': ' + stat.base_stat + '</small>';
-            ph += '<div class="stat-bar"><div class="stat-fill" style="width: ' + percentage + '%"></div></div></div>';
+        htmlContent += '<h6>Estatísticas:</h6>';
+        for(var i = 0; i < pokemonData.stats.length; i++) {
+            var pokemonStat = pokemonData.stats[i];
+            var statFillPercentage = (pokemonStat.base_stat / statMaxValue) * 100;
+            htmlContent += '<div><small>' + pokemonStat.stat.name + ': ' + pokemonStat.base_stat + '</small>';
+            htmlContent += '<div class="stat-bar"><div class="stat-fill" style="width: ' + statFillPercentage + '%"></div></div></div>';
         }
         
-        ph += '</div></div>';
+        htmlContent += '</div></div>';
         
-        document.getElementById('modalBody').innerHTML = ph;
+        document.getElementById('modalBody').innerHTML = htmlContent;
         
-        var mod = new bootstrap.Modal(document.getElementById('m'));
-        mod.show();
+        var modalInstance = new bootstrap.Modal(document.getElementById('m'));
+        modalInstance.show();
         
     } catch(error) {
         console.log('erro');
@@ -251,3 +254,4 @@ async function Minhe_nha(id) {
 window.onload = function() {
     startPage();
 };
+
