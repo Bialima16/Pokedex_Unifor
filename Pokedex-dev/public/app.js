@@ -6,6 +6,8 @@ var searchByNameOrID = ''; // alteração aqui // busca por nome ou ID // E
 var typeFilter = ''; //alteração aqui// filtro de tipo // F1
 var clearAndAddPokémonCards = null; // alteração aqui // função para limpar e adicionar cards de pokémons // G
 
+const homePage = 1; // alteração aqui // página inicial
+const percentageConverter = 100; // alteração aqui // conversão para porcentagem 
 const maxPokemonPerType = 100; // alteração aqui // número máximo de pokémons por tipo // F2
 const deciConversion = 10; // alteração aqui // conversão decimal // 
 const statMaxValue = 255; // alteração aqui // valor máximo de estatísticas // 
@@ -40,7 +42,7 @@ async function loadListOfPokemon() { //alteração aqui // carrega a lista de po
     document.getElementById('pokemonGrid').style.display = 'none';
     
     try {
-        var ignorePokemon = (currentPage - 1) * itensPerPage; //alteração aqui // ignorar pokémons 
+        var ignorePokemon = (currentPage - homePage) * itensPerPage; //alteração aqui // ignorar pokémons 
         var searchForPokemonByPages = APIPokemon + '?limit=' + itensPerPage + '&offset=' + ignorePokemon; //alteração aqui // busca pokémons por página
         var searchForPokemonInformantionByPages = await fetch(searchForPokemonByPages); //alteração aqui 
         var saveThePageData = await searchForPokemonInformantionByPages.json(); //alteração aqui // salvar os dados da página
@@ -136,7 +138,7 @@ function RenderPokemonCards() { //alteração aqui // renderiza os cards de pok�
         document.getElementById('pageInfo').textContent = 'Página ' + currentPage; //alteração aqui
     }
 
-    document.getElementById('prevBtn').disabled = currentPage === 1 || typeFilter !== ''; //alteração aqui
+    document.getElementById('prevBtn').disabled = currentPage === homePage || typeFilter !== ''; //alteração aqui
     document.getElementById('nextBtn').disabled = typeFilter !== ''; //alteração aqui
 }
 
@@ -157,12 +159,12 @@ function reset() {
     document.getElementById('typeFilter').value = '';
     searchByNameOrID = ''; // alteração aqui
     typeFilter = ''; //alteração aqui
-    currentPage = 1; // alteração aqui
+    currentPage = homePage; // alteração aqui
     loadListOfPokemon(); //alteração aqui
 }
 
 function goBackAPage() { //alteração aqui // voltar uma página
-    if(currentPage > 1) { //alteração aqui
+    if(currentPage > homePage) { //alteração aqui
         currentPage--; //alteração aqui
         if(typeFilter !== '') { // alteração aqui
             RenderPokemonCards();
@@ -233,7 +235,7 @@ async function openPokemonDetails(id) {//Modal com detalhes do pokémon
         htmlContent += '<h6>Estatísticas:</h6>';
         for(var i = 0; i < pokemonData.stats.length; i++) {
             var pokemonStat = pokemonData.stats[i];
-            var statFillPercentage = (pokemonStat.base_stat / statMaxValue) * 100;
+            var statFillPercentage = (pokemonStat.base_stat / statMaxValue) * percentageConverter;
             htmlContent += '<div><small>' + pokemonStat.stat.name + ': ' + pokemonStat.base_stat + '</small>';
             htmlContent += '<div class="stat-bar"><div class="stat-fill" style="width: ' + statFillPercentage + '%"></div></div></div>';
         }
